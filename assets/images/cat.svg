@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+    <style>
+        .cat { fill: #000000; }
+    </style>
+    <path class="cat" d="M10 8h2v2h-2zM20 8h2v2h-2zM8 10h2v14H8zM22 10h2v14h-2zM10 24h12v2H10zM12 14h8v2h-8zM14 18h4v2h-4z"/>
+</svg> 
