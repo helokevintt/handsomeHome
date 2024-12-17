@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const tooltips = {
         'blog': '访问我的博客',
         'github': '查看我的开源项目',
-        'qq': '联系我吧',
+        'qq': '联系我',
         'email': '给我发送邮件',
         'settings': '个性化设置'
     };
@@ -314,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         function Particle() {
-            this.characters = ["✦", "✧", "⋆", "✫", "✬", "✭", "✮", "✯", ""];
+            this.characters = ["✦", "✧", "⋆", "✫", "✬", "✭", "✯", "✰", ""];
             this.lifeSpan = 120;
             this.initialStyles = {
                 "position": "fixed",
@@ -370,7 +370,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 禁用右键菜单
     document.addEventListener('contextmenu', function(e) {
         e.preventDefault();
-        showMessage('为了网站安全，已禁用右键菜单');
+        showMessage('为了网站安全，请禁用右键菜单');
         return false;
     });
     
@@ -453,7 +453,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 移除鼠标移动事件监听器
             document.removeEventListener('mousemove', window.onMouseMove);
         } else {
-            // 重新添加鼠标移动事���监听器
+            // 重新添加鼠标移动事件监听器
             document.addEventListener('mousemove', window.onMouseMove);
         }
     });
@@ -463,7 +463,7 @@ document.addEventListener('DOMContentLoaded', function() {
         clickEffectEnabled = this.checked;
     });
 
-    // 默认壁纸链接
+    // 壁纸链接
     const defaultWallpaper = "https://files.codelife.cc/itab/defaultWallpaper/videos/02.mp4"; // 当前使用的默认壁纸链接
     const videoBackground = document.querySelector('.video-background');
     const bingWallpaperButton = document.getElementById('bing-wallpaper');
@@ -473,10 +473,10 @@ document.addEventListener('DOMContentLoaded', function() {
     async function initializeWallpaper() {
         const savedWallpaper = localStorage.getItem('customWallpaper');
         if (savedWallpaper) {
-            // 如果有保存的壁纸，使用它
+            // 果有保存的壁纸，使用它
             setWallpaper(savedWallpaper);
         } else {
-            // 否则从 wallpapers.json 随机选择一个壁纸
+            // 否则从 wallpapers.json 机选择一个纸
             try {
                 const encodedData = await loadWallpapers(); // 加载并编码 JSON 数据
                 const decodedData = JSON.parse(atob(encodedData)); // 解码 Base64 数据
@@ -486,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const randomVideoUrl = decodedData.data[randomIndex].url; // 随机选择一个视频 URL
                     setWallpaper(randomVideoUrl); // 设置壁纸
                 } else {
-                    setWallpaper(defaultWallpaper); // 如果没有数据，用默认壁纸
+                    setWallpaper(defaultWallpaper); // 如果没数据，用默认壁纸
                 }
             } catch (error) {
                 console.error("初始化壁纸时发生错误:", error);
@@ -517,7 +517,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return btoa(unescape(encodeURIComponent(str)));
     }
 
-    // 获取每日 Bing 图片
+    // 获取日 Bing 图片
     bingWallpaperButton.addEventListener('click', async function() {
         const cachedImage = localStorage.getItem('bingWallpaper'); // 尝试从缓存中获取
         const cachedTime = localStorage.getItem('bingWallpaperTime'); // 获取缓存时间
@@ -527,13 +527,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const currentHour = now.getHours();
         const currentDate = now.toISOString().split('T')[0]; // 获取当前日期（YYYY-MM-DD）
 
-        // 检查缓存时间是否在今天的 00:00 之前
+        // 检查缓存间是否在今天的 00:00 之前
         if (cachedImage && cachedTime && (Date.now() - cachedTime < 3600000) && (new Date(parseInt(cachedTime)).toISOString().split('T')[0] === currentDate)) {
             setWallpaper(cachedImage);
             showMessage('已使用缓存的每日 Bing 图片');
             return;
         } else {
-            // 如果缓存过期，清除缓存
+            // 如果存过，清除缓存
             localStorage.removeItem('bingWallpaper');
             localStorage.removeItem('bingWallpaperTime');
         }
@@ -573,7 +573,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 setWallpaper(imageUrl); // 设置壁纸
                 showMessage('莫哈维动态图已设置！');
             } else {
-                showMessage(`获取莫哈维动态图失败：${data.msg}`); // 显示错误信��
+                showMessage(`获取莫哈维动态图失败：${data.msg}`); // 显示错误信息
             }
         } catch (error) {
             showMessage(`获取莫哈维动态图失败：${error.message}`);
@@ -603,7 +603,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 showMessage('获取动态壁纸失败，请重试');
             }
         } catch (error) {
-            console.error("获取动态壁纸时发生错误:", error);
+            console.error("获取动态壁纸时发生错��:", error);
             showMessage(`获取动态壁纸失败：${error.message}`);
         }
     }
@@ -635,20 +635,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="modalLabel">${announcementConfig.popupTitle}</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
                         </div>
                         <div class="modal-body">
                             <p>${announcementConfig.popupMessage}</p>
-                            ${announcementConfig.redirectFlag ? 
-                                `<input type="text" id="redirectUrlInput" placeholder="请输入跳转地址" class="form-control" value="${announcementConfig.redirectUrl}">` : 
-                                ''
-                            }
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-primary" id="confirmButton">${announcementConfig.confirmButtonText}</button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">${announcementConfig.dismissButtonText}</button>
+                            <button type="button" class="btn btn-secondary" id="dismissButton">${announcementConfig.dismissButtonText}</button>
                         </div>
                     </div>
                 </div>
@@ -663,15 +656,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 处理确认按钮点击事件
         document.getElementById('confirmButton').onclick = function() {
-            const redirectUrl = announcementConfig.redirectFlag ? document.getElementById('redirectUrlInput').value : null; // 获取用户输入的跳转地址
-            localStorage.setItem('popupDismissed', Date.now());
+            localStorage.setItem('popupDismissed', Date.now()); // 设置弹窗被确认的时间
             $('#interactiveModal').modal('hide');
             // 移除模态框
             setTimeout(() => {
                 document.getElementById('interactiveModal').remove();
-                if (redirectUrl) {
-                    window.location.href = redirectUrl; // 跳转到指定地址
+                if (announcementConfig.redirectFlag) {
+                    window.open(announcementConfig.redirectUrl, '_blank'); // 在新窗口中跳转
                 }
+            }, 300); // 等待模态框动画结束后再移除
+        };
+
+        // 处理稍后再说按钮点击事件
+        document.getElementById('dismissButton').onclick = function() {
+            localStorage.setItem('popupDismissed', Date.now()); // 设置弹窗被确认的时间
+            $('#interactiveModal').modal('hide');
+            // 移除模态框
+            setTimeout(() => {
+                document.getElementById('interactiveModal').remove();
             }, 300); // 等待模态框动画结束后再移除
         };
     }
@@ -680,7 +682,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const script = document.createElement('script');
     script.src = 'js/config.js';
     script.onload = function() {
-        // 页面加载完成后显示弹出提示
+        // 页面载完成后显示出提示
         setTimeout(() => {
             const dismissedTime = localStorage.getItem('popupDismissed');
             if (announcementConfig.showPopup && (!dismissedTime || (Date.now() - dismissedTime > announcementConfig.popupDismissTime))) {
