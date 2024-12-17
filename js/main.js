@@ -314,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         function Particle() {
-            this.characters = ["✦", "✧", "⋆", "✫", "✬", "✭", "✮", "✯", "✰"];
+            this.characters = ["✦", "✧", "⋆", "✫", "✬", "✭", "✮", "✯", ""];
             this.lifeSpan = 120;
             this.initialStyles = {
                 "position": "fixed",
@@ -374,37 +374,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return false;
     });
     
-    // 禁用 F12 和其��开发者工具快捷键
-    document.addEventListener('keydown', function(e) {
-        // F12
-        if (e.keyCode === 123) {
-            e.preventDefault();
-            showMessage('为了网站安全，已禁用 F12 功能');
-            return false;
-        }
-        
-        // Ctrl + Shift + I
-        if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
-            e.preventDefault();
-            showMessage('为了网站安全，已禁用开发者工具');
-            return false;
-        }
-        
-        // Ctrl + Shift + J
-        if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
-            e.preventDefault();
-            showMessage('为了网站安全，已禁用控制台');
-            return false;
-        }
-        
-        // Ctrl + U
-        if (e.ctrlKey && e.keyCode === 85) {
-            e.preventDefault();
-            showMessage('为了网站安全，已禁用查看源代码功能');
-            return false;
-        }
-    });
-    
     // 禁用开发者工具
     window.addEventListener('devtoolschange', function(e) {
         if (e.detail.open) {
@@ -418,7 +387,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let mouseEffectEnabled = true;
     let clickEffectEnabled = true;
 
-    // 鼠标点击文字效果
+    // ��击文字效果
     const words = ["富强", "民主", "文明", "和谐", "自由", "平等", "公正", "法治", "爱国", "敬业", "诚信", "友善"];
     const colors = [
         "#FF0000", // 红色
@@ -483,4 +452,168 @@ document.addEventListener('DOMContentLoaded', function() {
     clickEffectToggle.addEventListener('change', function() {
         clickEffectEnabled = this.checked;
     });
+
+    // 默认壁纸链接
+    const defaultWallpaper = "https://files.codelife.cc/itab/defaultWallpaper/videos/02.mp4"; // 当前使用的默认壁纸链接
+    const videoBackground = document.querySelector('.video-background');
+    const bingWallpaperButton = document.getElementById('bing-wallpaper');
+    const resetWallpaperButton = document.getElementById('reset-wallpaper');
+
+    // 初始化壁纸
+    async function initializeWallpaper() {
+        const savedWallpaper = localStorage.getItem('customWallpaper');
+        if (savedWallpaper) {
+            // 如果有保存的壁纸，使用它
+            setWallpaper(savedWallpaper);
+        } else {
+            // 否则从 wallpapers.json 随机选择一个壁纸
+            try {
+                const encodedData = await loadWallpapers(); // 加载并编码 JSON 数据
+                const decodedData = JSON.parse(atob(encodedData)); // 解码 Base64 数据
+
+                if (decodedData.code === 200 && decodedData.data.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * decodedData.data.length);
+                    const randomVideoUrl = decodedData.data[randomIndex].url; // 随机选择一个视频 URL
+                    setWallpaper(randomVideoUrl); // 设置壁纸
+                } else {
+                    setWallpaper(defaultWallpaper); // 如果没有数据，使用默认壁纸
+                }
+            } catch (error) {
+                console.error("初始化壁纸时发生错误:", error);
+                setWallpaper(defaultWallpaper); // 如果发生错误，使用默认壁纸
+            }
+        }
+    }
+
+    // 设置壁纸的函数
+    function setWallpaper(url) {
+        videoBackground.innerHTML = `
+            <div class="video-wrap">
+                ${url.endsWith('.mp4') ? 
+                    `<video autoplay loop muted playsinline class="video-content">
+                        <source src="${url}" type="video/mp4">
+                    </video>` : 
+                    `<img src="${url}" class="video-content" style="width: 100%; height: 100%; object-fit: cover;">`}
+            </div>
+            <div class="video-overlay"></div>
+        `;
+    }
+
+    // 初始化壁纸
+    initializeWallpaper();
+
+    // Base64 编码函数
+    function base64Encode(str) {
+        return btoa(unescape(encodeURIComponent(str)));
+    }
+
+    // 获取每日 Bing 图片
+    bingWallpaperButton.addEventListener('click', async function() {
+        const cachedImage = localStorage.getItem('bingWallpaper'); // 尝试从缓存中获取
+        if (cachedImage) {
+            setWallpaper(cachedImage);
+            showMessage('已使用缓存的每日 Bing 图片');
+            return;
+        }
+
+        const apiUrl = 'https://myhkw.cn/open/img/bing?key=a32f84f6c318499a8b0dd369b080ca4d&type=json';
+        const encodedUrl = base64Encode(apiUrl); // 对 URL 进行 Base64 编码
+
+        try {
+            const response = await fetch('/api/bing-wallpaper?url=' + encodedUrl); // 使用后端代理
+            const data = await response.json();
+
+            // 检查响应状态
+            if (data.code === 1) {
+                const imageUrl = data.img; // 获取图片地址
+                setWallpaper(imageUrl);
+                localStorage.setItem('customWallpaper', imageUrl); // 保存用户选择的壁纸
+                localStorage.setItem('bingWallpaper', imageUrl); // 缓存每日 Bing 图片
+                showMessage('每日 Bing 图片已设置！');
+            } else {
+                showMessage(`获取每日 Bing 图片失败：${data.msg}`); // 显示错误信息
+            }
+        } catch (error) {
+            showMessage(`获取每日 Bing 图片失败：${error.message}`);
+        }
+    });
+
+    // 获取莫哈维动态图
+    const mojaveWallpaperButton = document.getElementById('mojaveWallpaperButton');
+    mojaveWallpaperButton.addEventListener('click', async function() {
+        const cachedMojave = localStorage.getItem('mojaveWallpaper'); // 尝试从缓存中获取
+        if (cachedMojave) {
+            setWallpaper(cachedMojave);
+            showMessage('已使用缓存的莫哈维动态图！');
+            return;
+        }
+
+        const apiUrl = 'https://myhkw.cn/open/img/mojave?key=a32f84f6c318499a8b0dd369b080ca4d&type=json';
+        const encodedUrl = base64Encode(apiUrl); // 对 URL 进行 Base64 编码
+
+        try {
+            const response = await fetch('/api/mojave-wallpaper?url=' + encodedUrl); // 使用后端代理
+            const data = await response.json();
+
+            // 检查响应状态
+            if (data.code === 1) {
+                const imageUrl = data.img; // 获取图片地址
+                setWallpaper(imageUrl);
+                localStorage.setItem('customWallpaper', imageUrl); // 保存用户选择的壁纸
+                localStorage.setItem('mojaveWallpaper', imageUrl); // 缓存莫哈维动态图
+                showMessage('莫哈维动态图已设置！');
+            } else {
+                showMessage(`获取莫哈维动态图失败：${data.msg}`); // 显示错误信息
+            }
+        } catch (error) {
+            showMessage(`获取莫哈维动态图失败：${error.message}`);
+        }
+    });
+
+    // 恢复默认壁纸
+    resetWallpaperButton.addEventListener('click', function() {
+        setWallpaper(defaultWallpaper);
+        localStorage.removeItem('customWallpaper'); // 清除保存的壁纸
+        showMessage('已恢复默认壁纸！');
+    });
+
+    // 获取随机动态壁纸
+    async function getRandomWallpaper() {
+        try {
+            const encodedData = await loadWallpapers(); // 加载并编码 JSON 数据
+            const decodedData = JSON.parse(atob(encodedData)); // 解码 Base64 数据
+
+            if (decodedData.code === 200 && decodedData.data.length > 0) {
+                const randomIndex = Math.floor(Math.random() * decodedData.data.length);
+                const randomVideoUrl = decodedData.data[randomIndex].url;
+                setWallpaper(randomVideoUrl);
+                localStorage.setItem('customWallpaper', randomVideoUrl);
+                showMessage('随机动态壁纸已设置！');
+            } else {
+                showMessage('获取动态壁纸失败，请重试���');
+            }
+        } catch (error) {
+            console.error("获取动态壁纸时发生错误:", error);
+            showMessage(`获取动态壁纸失败：${error.message}`);
+        }
+    }
+
+    // 绑定按钮事件
+    const randomWallpaperButton = document.getElementById('random-wallpaper'); // 假设您有一个按钮用于获取随机壁纸
+    randomWallpaperButton.addEventListener('click', getRandomWallpaper);
+
+    // 加载 JSON 文件并返回其内容
+    async function loadWallpapers() {
+        try {
+            const response = await fetch('wallpapers.json'); // 获取 JSON 文件
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`); // 抛出错误
+            }
+            const data = await response.json(); // 解析 JSON 数据
+            return btoa(JSON.stringify(data)); // 将 JSON 数据编码为 Base64
+        } catch (error) {
+            console.error("加载壁纸时发生错误:", error);
+            throw error; // 重新抛出错误以便在调用时处理
+        }
+    }
 }); 

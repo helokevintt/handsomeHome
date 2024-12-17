@@ -58,7 +58,7 @@ body {
 
 /* 个人信息卡片 */
 .profile-card {
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.4);
     border-radius: 24px;
     padding: 50px 40px;
     text-align: center;
@@ -98,7 +98,7 @@ body {
     transition: transform 0.8s ease;
 }
 
-/* 彩虹呼吸灯动画 */
+/* 彩虹呼灯动画 */
 @keyframes rainbow-pulse {
     0% {
         box-shadow: 0 0 20px rgba(255, 0, 0, 0.6),
@@ -202,7 +202,7 @@ body {
     padding: 10px;
 }
 
-/* 打字效���容器 */
+/* 打字效容器 */
 #switch-box {
     background: linear-gradient(120deg, #00c6ff 30%, #0072ff);
     -webkit-background-clip: text;
@@ -451,7 +451,7 @@ body {
     color: rgba(0, 0, 0, 0.8);
 }
 
-/* 设置面板重新设计 */
+/* ���置面板重新设计 */
 .settings-panel {
     position: fixed;
     top: 50%;
@@ -705,17 +705,16 @@ input:checked + .slider:before {
 
 /* 提示框样式 */
 .tooltip {
-    position: fixed;
+    position: absolute;
     background: rgba(0, 0, 0, 0.8);
     color: white;
     padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 14px;
+    border-radius: 4px;
+    font-size: 12px;
     pointer-events: none;
-    opacity: 0;
     transition: opacity 0.3s ease;
+    opacity: 0;
     z-index: 1000;
-    white-space: nowrap;
 }
 
 .tooltip::before {
@@ -1023,5 +1022,107 @@ input:checked + .slider:before {
 .copyright a:hover::after {
     transform: scaleX(1);
     transform-origin: left;
+}
+
+/* 按钮组样式 */
+.btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px; /* 按钮之间的间距 */
+}
+
+/* 按钮样式 */
+.btn {
+    flex: 1; /* 使按钮均匀分布 */
+    min-width: 120px; /* 设置按钮的最小宽度 */
+    transition: background-color 0.3s, transform 0.2s; /* 添加过渡效果 */
+    border-radius: 8px; /* 添加圆角 */
+}
+
+.btn:hover {
+    transform: translateY(-2px); /* 悬停时轻微上移 */
+}
+
+.btn:active {
+    transform: translateY(1px); /* 点击时轻微下移 */
+}
+
+/* 自定义壁纸按钮 */
+.btn-primary {
+    background-color: #007bff; /* 蓝色 */
+    border: none;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3; /* 深���色 */
+}
+
+.btn-primary:active {
+    background-color: #004085; /* 更深的蓝色 */
+}
+
+/* 每日 Bing 和莫哈维动态图按钮 */
+.btn-secondary {
+    background-color: #6c757d; /* 灰色 */
+    border: none;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268; /* 深灰色 */
+}
+
+.btn-secondary:active {
+    background-color: #4e555b; /* 更深的灰色 */
+}
+
+/* 恢复默认壁纸按钮 */
+.btn-danger {
+    background-color: #dc3545; /* 红色 */
+    border: none;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c82333; /* 深红色 */
+}
+
+.btn-danger:active {
+    background-color: #bd2130; /* 更深的红色 */
+}
+
+/* 提示框样式 */
+.tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+    z-index: 1000;
+}
+
+/* 模态框样式 */
+.modal-content {
+    border-radius: 10px; /* 圆角 */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* 阴影效果 */
+}
+
+.modal-header {
+    background-color: #007bff; /* 模态框头部背景色 */
+    color: white; /* 文字颜色 */
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between; /* 按钮两端对齐 */
+}
+
+.modal-body {
+    padding: 20px; /* 内边距 */
 }
   
