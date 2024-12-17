@@ -374,14 +374,14 @@ document.addEventListener('DOMContentLoaded', function() {
         return false;
     });
     
-    // 禁用 F12 和其他开发者工具
-    window.addEventListener('keydown', function(e) {
-        // 检测 F12 键
-        if (e.key === 'F12') {
-            e.preventDefault();
-            showMessage('为了网站安全，请不要打开开发者工具');
-        }
-    });
+    // // 禁用 F12 和其他开发者工具
+    // window.addEventListener('keydown', function(e) {
+    //     // 检测 F12 键
+    //     if (e.key === 'F12') {
+    //         e.preventDefault();
+    //         showMessage('为了网站安全，请不要打开开发者工具');
+    //     }
+    // });
 
     // 监测开发者工具的打开状态
     setInterval(function() {
@@ -453,7 +453,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 移除鼠标移动事件监听器
             document.removeEventListener('mousemove', window.onMouseMove);
         } else {
-            // 重新添加鼠标移动事件监听器
+            // 重新添加鼠标移动事���监听器
             document.addEventListener('mousemove', window.onMouseMove);
         }
     });
@@ -473,7 +473,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function initializeWallpaper() {
         const savedWallpaper = localStorage.getItem('customWallpaper');
         if (savedWallpaper) {
-            // 如果有保存的壁���，使用它
+            // 如果有保存的壁纸，使用它
             setWallpaper(savedWallpaper);
         } else {
             // 否则从 wallpapers.json 随机选择一个壁纸
@@ -520,10 +520,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // 获取每日 Bing 图片
     bingWallpaperButton.addEventListener('click', async function() {
         const cachedImage = localStorage.getItem('bingWallpaper'); // 尝试从缓存中获取
-        if (cachedImage) {
+        const cachedTime = localStorage.getItem('bingWallpaperTime'); // 获取缓存时间
+
+        // 获取当前时间
+        const now = new Date();
+        const currentHour = now.getHours();
+        const currentDate = now.toISOString().split('T')[0]; // 获取当前日期（YYYY-MM-DD）
+
+        // 检查缓存时间是否在今天的 00:00 之前
+        if (cachedImage && cachedTime && (Date.now() - cachedTime < 3600000) && (new Date(parseInt(cachedTime)).toISOString().split('T')[0] === currentDate)) {
             setWallpaper(cachedImage);
             showMessage('已使用缓存的每日 Bing 图片');
             return;
+        } else {
+            // 如果缓存过期，清除缓存
+            localStorage.removeItem('bingWallpaper');
+            localStorage.removeItem('bingWallpaperTime');
         }
 
         const apiUrl = 'https://myhkw.cn/open/img/bing?key=a32f84f6c318499a8b0dd369b080ca4d&type=json';
@@ -535,8 +547,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.code === 1) {
                 const imageUrl = data.img; // 获取图片地址
                 setWallpaper(imageUrl);
-                localStorage.setItem('customWallpaper', imageUrl); // 保存用户选择的壁纸
                 localStorage.setItem('bingWallpaper', imageUrl); // 缓存每日 Bing 图片
+                localStorage.setItem('bingWallpaperTime', Date.now()); // 保存缓存时间
                 showMessage('每日 Bing 图片已设置！');
             } else {
                 showMessage(`获取每日 Bing 图片失败：${data.msg}`); // 显示错误信息
@@ -549,15 +561,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // 获取莫哈维动态图
     const mojaveWallpaperButton = document.getElementById('mojaveWallpaperButton');
     mojaveWallpaperButton.addEventListener('click', async function() {
-        const cachedMojave = localStorage.getItem('mojaveWallpaper'); // 尝试从缓存中获取
-        if (cachedMojave) {
-            setWallpaper(cachedMojave);
-            showMessage('已使用缓存的莫哈维动态图！');
-            return;
-        }
-
         const apiUrl = 'https://myhkw.cn/open/img/mojave?key=a32f84f6c318499a8b0dd369b080ca4d&type=json';
-       
+        
         try {
             const response = await fetch(apiUrl); // 使用后端代理
             const data = await response.json();
@@ -565,12 +570,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // 检查响应状态
             if (data.code === 1) {
                 const imageUrl = data.img; // 获取图片地址
-                setWallpaper(imageUrl);
-                localStorage.setItem('customWallpaper', imageUrl); // 保存用户选择的壁纸
-                localStorage.setItem('mojaveWallpaper', imageUrl); // 缓存莫哈维动态图
+                setWallpaper(imageUrl); // 设置壁纸
                 showMessage('莫哈维动态图已设置！');
             } else {
-                showMessage(`获取莫哈维动态图失败：${data.msg}`); // 显示错误信息
+                showMessage(`获取莫哈维动态图失败：${data.msg}`); // 显示错误信��
             }
         } catch (error) {
             showMessage(`获取莫哈维动态图失败：${error.message}`);
@@ -623,4 +626,67 @@ document.addEventListener('DOMContentLoaded', function() {
             throw error; // 重新抛出错误以便在调用时处理
         }
     }
+
+    function showInteractiveMessage() {
+        // 创建模态框的 HTML 结构
+        const modalHTML = `
+            <div class="modal fade" id="interactiveModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalLabel">${announcementConfig.popupTitle}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>${announcementConfig.popupMessage}</p>
+                            ${announcementConfig.redirectFlag ? 
+                                `<input type="text" id="redirectUrlInput" placeholder="请输入跳转地址" class="form-control" value="${announcementConfig.redirectUrl}">` : 
+                                ''
+                            }
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" id="confirmButton">${announcementConfig.confirmButtonText}</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">${announcementConfig.dismissButtonText}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // 将模态框添加到文档中
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        // 显示模态框
+        $('#interactiveModal').modal('show');
+
+        // 处理确认按钮点击事件
+        document.getElementById('confirmButton').onclick = function() {
+            const redirectUrl = announcementConfig.redirectFlag ? document.getElementById('redirectUrlInput').value : null; // 获取用户输入的跳转地址
+            localStorage.setItem('popupDismissed', Date.now());
+            $('#interactiveModal').modal('hide');
+            // 移除模态框
+            setTimeout(() => {
+                document.getElementById('interactiveModal').remove();
+                if (redirectUrl) {
+                    window.location.href = redirectUrl; // 跳转到指定地址
+                }
+            }, 300); // 等待模态框动画结束后再移除
+        };
+    }
+
+    // 引入配置文件
+    const script = document.createElement('script');
+    script.src = 'js/config.js';
+    script.onload = function() {
+        // 页面加载完成后显示弹出提示
+        setTimeout(() => {
+            const dismissedTime = localStorage.getItem('popupDismissed');
+            if (announcementConfig.showPopup && (!dismissedTime || (Date.now() - dismissedTime > announcementConfig.popupDismissTime))) {
+                showInteractiveMessage(); // 调用弹窗函数
+            }
+        }, announcementConfig.popupDelay);
+    };
+    document.head.appendChild(script);
 }); 
