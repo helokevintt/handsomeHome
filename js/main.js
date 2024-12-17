@@ -374,20 +374,30 @@ document.addEventListener('DOMContentLoaded', function() {
         return false;
     });
     
-    // 禁用开发者工具
-    window.addEventListener('devtoolschange', function(e) {
-        if (e.detail.open) {
-            showMessage('请不要打开开发者工具');
-            window.location.reload();
+    // 禁用 F12 和其他开发者工具
+    window.addEventListener('keydown', function(e) {
+        // 检测 F12 键
+        if (e.key === 'F12') {
+            e.preventDefault();
+            showMessage('为了网站安全，请不要打开开发者工具');
         }
     });
+
+    // 监测开发者工具的打开状态
+    setInterval(function() {
+        const devtoolsOpen = window.devtools && window.devtools.open;
+        if (devtoolsOpen) {
+            showMessage('为了网站安全，请不要打开开发者工具');
+            window.location.reload(); // 刷新页面
+        }
+    }, 1000);
 
     const mouseEffectToggle = document.getElementById('mouse-effect');
     const clickEffectToggle = document.getElementById('click-effect');
     let mouseEffectEnabled = true;
     let clickEffectEnabled = true;
 
-    // ��击文字效果
+    // 击文字效果
     const words = ["富强", "民主", "文明", "和谐", "自由", "平等", "公正", "法治", "爱国", "敬业", "诚信", "友善"];
     const colors = [
         "#FF0000", // 红色
@@ -463,7 +473,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function initializeWallpaper() {
         const savedWallpaper = localStorage.getItem('customWallpaper');
         if (savedWallpaper) {
-            // 如果有保存的壁纸，使用它
+            // 如果有保存的壁���，使用它
             setWallpaper(savedWallpaper);
         } else {
             // 否则从 wallpapers.json 随机选择一个壁纸
@@ -476,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const randomVideoUrl = decodedData.data[randomIndex].url; // 随机选择一个视频 URL
                     setWallpaper(randomVideoUrl); // 设置壁纸
                 } else {
-                    setWallpaper(defaultWallpaper); // 如果没有数据，使用默认壁纸
+                    setWallpaper(defaultWallpaper); // 如果没有数据，用默认壁纸
                 }
             } catch (error) {
                 console.error("初始化壁纸时发生错误:", error);
@@ -517,10 +527,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const apiUrl = 'https://myhkw.cn/open/img/bing?key=a32f84f6c318499a8b0dd369b080ca4d&type=json';
-        const encodedUrl = base64Encode(apiUrl); // 对 URL 进行 Base64 编码
-
         try {
-            const response = await fetch('/api/bing-wallpaper?url=' + encodedUrl); // 使用后端代理
+            const response = await fetch(apiUrl); // 使用端代理
             const data = await response.json();
 
             // 检查响应状态
@@ -549,10 +557,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const apiUrl = 'https://myhkw.cn/open/img/mojave?key=a32f84f6c318499a8b0dd369b080ca4d&type=json';
-        const encodedUrl = base64Encode(apiUrl); // 对 URL 进行 Base64 编码
-
+       
         try {
-            const response = await fetch('/api/mojave-wallpaper?url=' + encodedUrl); // 使用后端代理
+            const response = await fetch(apiUrl); // 使用后端代理
             const data = await response.json();
 
             // 检查响应状态
@@ -590,7 +597,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 localStorage.setItem('customWallpaper', randomVideoUrl);
                 showMessage('随机动态壁纸已设置！');
             } else {
-                showMessage('获取动态壁纸失败，请重试���');
+                showMessage('获取动态壁纸失败，请重试');
             }
         } catch (error) {
             console.error("获取动态壁纸时发生错误:", error);
