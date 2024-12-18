@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 初始化透明度
-    profileCard.style.backgroundColor = `rgba(255, 255, 255, 0.6)`;
+    profileCard.style.backgroundColor = `rgba(255, 255, 255, 0.5)`;
 
     // 点击外部关闭设置面板
     document.addEventListener('click', function(e) {
@@ -658,7 +658,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 处理确认按钮点击事件
         document.getElementById('confirmButton').onclick = function() {
-            localStorage.setItem('popupDismissed', Date.now()); // 设置弹窗被确认的时���
+            localStorage.setItem('popupDismissed', Date.now()); // 设置弹窗被确认的时间
             $('#interactiveModal').modal('hide');
             // 移除模态框
             setTimeout(() => {
@@ -693,4 +693,116 @@ document.addEventListener('DOMContentLoaded', function() {
         }, announcementConfig.popupDelay);
     };
     document.head.appendChild(script);
+
+    // 添加 CSP 头部
+    const meta = document.createElement('meta');
+    meta.httpEquiv = "Content-Security-Policy";
+    meta.content = "default-src 'self' https:; script-src 'self' https: 'unsafe-inline' 'unsafe-eval'; style-src 'self' https: 'unsafe-inline';";
+    document.head.appendChild(meta);
+
+    // 添加 X-Frame-Options 头部
+    const frameOptions = document.createElement('meta');
+    frameOptions.httpEquiv = "X-Frame-Options";
+    frameOptions.content = "SAMEORIGIN";
+    document.head.appendChild(frameOptions);
+
+    // 添加 XSS 保护
+    const xssProtection = document.createElement('meta');
+    xssProtection.httpEquiv = "X-XSS-Protection";
+    xssProtection.content = "1; mode=block";
+    document.head.appendChild(xssProtection);
+
+    // 添加内容类型保护
+    const contentType = document.createElement('meta');
+    contentType.httpEquiv = "X-Content-Type-Options";
+    contentType.content = "nosniff";
+    document.head.appendChild(contentType);
+
+    // 添加图片懒加载
+    function lazyLoadImages() {
+        const images = document.querySelectorAll('img[data-src]');
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                    observer.unobserve(img);
+                }
+            });
+        });
+
+        images.forEach(img => imageObserver.observe(img));
+    }
+
+    // 在 DOMContentLoaded 事件中调用
+    document.addEventListener('DOMContentLoaded', lazyLoadImages);
+
+    // 添加 Service Worker 支持
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').then(registration => {
+                console.log('ServiceWorker registration successful');
+            }).catch(err => {
+                console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+    }
+
+    // 添加全局错误处理
+    window.onerror = function(msg, url, lineNo, columnNo, error) {
+        console.error('Error: ' + msg + '\nURL: ' + url + '\nLine: ' + lineNo + '\nColumn: ' + columnNo + '\nError object: ' + JSON.stringify(error));
+        return false;
+    };
+
+    // 添加未处理的 Promise 错误处理
+    window.addEventListener('unhandledrejection', event => {
+        console.error('Unhandled promise rejection:', event.reason);
+    });
+
+    // 添加 API 请求超时和重试机制
+    async function fetchWithRetry(url, options = {}, retries = 3) {
+        const timeout = options.timeout || 5000;
+        
+        for (let i = 0; i < retries; i++) {
+            try {
+                const controller = new AbortController();
+                const id = setTimeout(() => controller.abort(), timeout);
+                
+                const response = await fetch(url, {
+                    ...options,
+                    signal: controller.signal
+                });
+                
+                clearTimeout(id);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                return response;
+            } catch (error) {
+                if (i === retries - 1) throw error;
+                await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, i)));
+            }
+        }
+    }
+
+    // 动态加载非关键资源
+    function loadNonCriticalResources() {
+        // 延迟加载字体
+        const font = document.createElement('link');
+        font.rel = 'stylesheet';
+        font.href = 'https://fonts.googleapis.com/css2?family=Your-Font-Family&display=swap';
+        document.head.appendChild(font);
+        
+        // 延迟加载非关键脚本
+        const script = document.createElement('script');
+        script.src = 'https://myhkw.cn/player/js/jquery.min.js';
+        script.async = true;
+        document.body.appendChild(script);
+    }
+
+    // 在页面加载完成后执行
+    window.addEventListener('load', loadNonCriticalResources);
 }); 
