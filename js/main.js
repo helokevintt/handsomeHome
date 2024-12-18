@@ -694,30 +694,6 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     document.head.appendChild(script);
 
-    // 添加 CSP 头部
-    const meta = document.createElement('meta');
-    meta.httpEquiv = "Content-Security-Policy";
-    meta.content = "default-src 'self' https:; script-src 'self' https: 'unsafe-inline' 'unsafe-eval'; style-src 'self' https: 'unsafe-inline';";
-    document.head.appendChild(meta);
-
-    // 添加 X-Frame-Options 头部
-    const frameOptions = document.createElement('meta');
-    frameOptions.httpEquiv = "X-Frame-Options";
-    frameOptions.content = "SAMEORIGIN";
-    document.head.appendChild(frameOptions);
-
-    // 添加 XSS 保护
-    const xssProtection = document.createElement('meta');
-    xssProtection.httpEquiv = "X-XSS-Protection";
-    xssProtection.content = "1; mode=block";
-    document.head.appendChild(xssProtection);
-
-    // 添加内容类型保护
-    const contentType = document.createElement('meta');
-    contentType.httpEquiv = "X-Content-Type-Options";
-    contentType.content = "nosniff";
-    document.head.appendChild(contentType);
-
     // 添加图片懒加载
     function lazyLoadImages() {
         const images = document.querySelectorAll('img[data-src]');
@@ -788,21 +764,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 动态加载非关键资源
-    function loadNonCriticalResources() {
-        // 延迟加载字体
-        const font = document.createElement('link');
-        font.rel = 'stylesheet';
-        font.href = 'https://fonts.googleapis.com/css2?family=Your-Font-Family&display=swap';
-        document.head.appendChild(font);
-        
-        // 延迟加载非关键脚本
-        const script = document.createElement('script');
-        script.src = 'https://myhkw.cn/player/js/jquery.min.js';
-        script.async = true;
-        document.body.appendChild(script);
-    }
-
-    // 在页面加载完成后执行
+    // 在页面加载完成后执���
     window.addEventListener('load', loadNonCriticalResources);
 }); 
