@@ -10,17 +10,23 @@ class Toolbox {
     }
 
     async init() {
-        // 加载工具配置
-        await this.loadConfig();
-        
-        // 初始化DOM
-        this.initDOM();
-        
-        // 绑定事件
-        this.bindEvents();
-        
-        // 初始化工具卡片
-        await this.initTools();
+        try {
+            // 加载工具配置
+            await this.loadConfig();
+            
+            // 初始化DOM
+            this.initDOM();
+            
+            // 绑定事件
+            this.bindEvents();
+            
+            // 初始化工具卡片
+            await this.initTools();
+
+            console.log('工具集初始化完成'); // 添加调试日志
+        } catch (error) {
+            console.error('工具集初始化失败:', error);
+        }
     }
 
     async loadConfig() {
@@ -92,18 +98,17 @@ class Toolbox {
     }
 
     bindEvents() {
-        // 修改头像点击事件的选择器，使用多个选择器确保能找到头像元素
-        const avatars = document.querySelectorAll('.avatar-circle img, .avatar, .loading-avatar');
-        avatars.forEach(avatar => {
-            if (avatar) {
-                avatar.style.cursor = 'pointer';
-                avatar.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.toggle();
-                });
-            }
-        });
+        // 头像点击事件
+        const avatar = document.querySelector('.loading-avatar');
+        if (avatar) {
+            avatar.style.cursor = 'pointer';
+            avatar.addEventListener('click', () => {
+                console.log('头像被点击'); // 添加调试日志
+                this.toggle();
+            });
+        } else {
+            console.warn('未找到头像元素'); // 添加调试日志
+        }
 
         // 关闭按钮事件
         const closeBtn = this.container.querySelector('.close-toolbox');
@@ -132,18 +137,20 @@ class Toolbox {
         const toolsContainer = this.container.querySelector('.toolbox-content');
         const categoriesContainer = this.container.querySelector('.toolbox-categories');
 
-        // 渲染分类
+        // 渲染分类按钮
         categoriesContainer.innerHTML = this.categories.map(category => `
             <button class="category-btn ${category.id === 'all' ? 'active' : ''}" 
                     data-category="${category.id}">
-                ${category.name}
+                <span class="category-icon">${category.icon}</span>
+                <span class="category-name">${category.name}</span>
             </button>
         `).join('');
 
         // 分类点击事件
         categoriesContainer.addEventListener('click', (e) => {
-            if (e.target.classList.contains('category-btn')) {
-                this.currentCategory = e.target.dataset.category;
+            const button = e.target.closest('.category-btn'); // 使用 closest 来确保点击图标也能触发
+            if (button) {
+                this.currentCategory = button.dataset.category;
                 categoriesContainer.querySelectorAll('.category-btn').forEach(btn => 
                     btn.classList.toggle('active', btn.dataset.category === this.currentCategory)
                 );
@@ -170,7 +177,7 @@ class Toolbox {
         
         // 过滤工具列表
         const filteredTools = this.tools.filter(tool => {
-            // 1. 搜索过滤: 检查工具名称、描述和标签是否包含搜索关键词
+            // 1. 搜索过滤: 检查工具名称和描述
             const matchesSearch = 
                 tool.name.toLowerCase().includes(this.searchQuery) ||
                 (tool.description || '').toLowerCase().includes(this.searchQuery);
@@ -179,11 +186,13 @@ class Toolbox {
             // 如果是"全部"分类(all)则始终返回true
             const matchesCategory = 
                 this.currentCategory === 'all' || 
-                tool.tags.includes(this.currentCategory); // 精确匹配分类ID
+                tool.tags.some(tag => tag.toLowerCase() === this.currentCategory.toLowerCase()); // 不区分大小写匹配
             
             // 3. 在标签中隐藏分类ID
             tool.displayTags = tool.tags.filter(tag => 
-                !this.categories.some(category => category.id === tag)
+                !this.categories.some(category => 
+                    category.id.toLowerCase() === tag.toLowerCase()
+                )
             );
             
             // 同时满足搜索和分类条件才显示
@@ -215,29 +224,35 @@ class Toolbox {
     }
 
     toggle() {
+        console.log('切换工具集显示状态, 当前状态:', this.isVisible); // 添加调试日志
         this.isVisible ? this.hide() : this.show();
     }
 
     show() {
         if (this.container) {
-            this.container.classList.remove('hidden'); // 先移除 hidden
+            console.log('显示工具集'); // 添加调试日志
+            this.container.classList.remove('hidden');
             requestAnimationFrame(() => {
                 this.container.classList.add('active');
                 this.isVisible = true;
+                document.body.classList.add('toolbox-open');
             });
         }
     }
 
     hide() {
         if (this.container) {
+            console.log('隐藏工具集'); // 添加调试日志
             this.container.classList.remove('active');
             this.isVisible = false;
+            document.body.classList.remove('toolbox-open');
         }
     }
 }
 
-// 初始化工具集
+// 确保 DOM 加载完成后再初始化工具集
 document.addEventListener('DOMContentLoaded', () => {
-    const toolbox = new Toolbox();
-    toolbox.init();
+    console.log('DOM加载完成，开始初始化工具集'); // 添加调试日志
+    window.toolbox = new Toolbox(); // 将实例保存到全局变量
+    window.toolbox.init();
 }); 

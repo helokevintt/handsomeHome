@@ -464,7 +464,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 壁纸链接
-    const defaultWallpaper = "https://files.codelife.cc/itab/defaultWallpaper/videos/02.mp4"; // 当前使用的默认壁纸链接
+    const defaultWallpaper = "https://files.codelife.cc/itab/defaultWallpaper/videos/02.mp4"; // 当前使用的默认壁纸链��
     const videoBackground = document.querySelector('.video-background');
     const bingWallpaperButton = document.getElementById('bing-wallpaper');
     const resetWallpaperButton = document.getElementById('reset-wallpaper');
@@ -550,7 +550,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 setWallpaper(imageUrl); // 设置壁纸
                 localStorage.setItem('bingWallpaper', imageUrl); // 缓存每日 Bing 图片
                 localStorage.setItem('bingWallpaperTime', Date.now()); // 保存缓存时间
-                showMessage('每日 Bing 图片已设置！');
+                showMessage('每日 Bing 图片已设���！');
             } else {
                 showMessage(`获取每日 Bing 图片失败：${data.msg}`); // 显示错误信息
             }
@@ -611,7 +611,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 绑定按钮事件
-    const randomWallpaperButton = document.getElementById('random-wallpaper'); // 假设您有一个按钮用于获取随机壁纸
+    const randomWallpaperButton = document.getElementById('random-wallpaper'); // 假设您有一个按钮���于获取随机壁纸
     randomWallpaperButton.addEventListener('click', getRandomWallpaper);
 
     // 加载 JSON 文件并返回其内容
@@ -680,40 +680,6 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    // 引入配置文件
-    const script = document.createElement('script');
-    script.src = 'js/config.js';
-    script.onload = function() {
-        // 页面载完成后显示出提示
-        setTimeout(() => {
-            const dismissedTime = localStorage.getItem('popupDismissed');
-            if (announcementConfig.showPopup && (!dismissedTime || (Date.now() - dismissedTime > announcementConfig.popupDismissTime))) {
-                showInteractiveMessage(); // 调用弹窗函数
-            }
-        }, announcementConfig.popupDelay);
-    };
-    document.head.appendChild(script);
-
-    // 添加图片懒加载
-    function lazyLoadImages() {
-        const images = document.querySelectorAll('img[data-src]');
-        const imageObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    img.src = img.dataset.src;
-                    img.removeAttribute('data-src');
-                    observer.unobserve(img);
-                }
-            });
-        });
-
-        images.forEach(img => imageObserver.observe(img));
-    }
-
-    // 在 DOMContentLoaded 事件中调用
-    document.addEventListener('DOMContentLoaded', lazyLoadImages);
-
     // 添加 Service Worker 支持
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -724,46 +690,4 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
-
-    // 添加全局错误处理
-    window.onerror = function(msg, url, lineNo, columnNo, error) {
-        console.error('Error: ' + msg + '\nURL: ' + url + '\nLine: ' + lineNo + '\nColumn: ' + columnNo + '\nError object: ' + JSON.stringify(error));
-        return false;
-    };
-
-    // 添加未处理的 Promise 错误处理
-    window.addEventListener('unhandledrejection', event => {
-        console.error('Unhandled promise rejection:', event.reason);
-    });
-
-    // 添加 API 请求超时和重试机制
-    async function fetchWithRetry(url, options = {}, retries = 3) {
-        const timeout = options.timeout || 5000;
-        
-        for (let i = 0; i < retries; i++) {
-            try {
-                const controller = new AbortController();
-                const id = setTimeout(() => controller.abort(), timeout);
-                
-                const response = await fetch(url, {
-                    ...options,
-                    signal: controller.signal
-                });
-                
-                clearTimeout(id);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                return response;
-            } catch (error) {
-                if (i === retries - 1) throw error;
-                await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, i)));
-            }
-        }
-    }
-
-    // 在页面加载完成后执���
-    window.addEventListener('load', loadNonCriticalResources);
 }); 
