@@ -471,12 +471,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 初始化壁纸
     async function initializeWallpaper() {
-        const savedWallpaper = localStorage.getItem('customWallpaper');
+        const savedWallpaper = localStorage.getItem('customWallpaper'); // 检查是否有保存的自定义壁纸
         if (savedWallpaper) {
-            // 果有保存的壁纸，使用它
+            // 如果有保存的壁纸，使用它
             setWallpaper(savedWallpaper);
         } else {
-            // 否则从 wallpapers.json 机选择一个纸
+            // 否则从 wallpapers.json 中选择一个壁纸
             try {
                 const encodedData = await loadWallpapers(); // 加载并编码 JSON 数据
                 const decodedData = JSON.parse(atob(encodedData)); // 解码 Base64 数据
@@ -507,6 +507,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="video-overlay"></div>
         `;
+        localStorage.setItem('customWallpaper', url); // 保存自定义壁纸到 localStorage
     }
 
     // 初始化壁纸
@@ -546,7 +547,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 检查响应状态
             if (data.code === 1) {
                 const imageUrl = data.img; // 获取图片地址
-                setWallpaper(imageUrl);
+                setWallpaper(imageUrl); // 设置壁纸
                 localStorage.setItem('bingWallpaper', imageUrl); // 缓存每日 Bing 图片
                 localStorage.setItem('bingWallpaperTime', Date.now()); // 保存缓存时间
                 showMessage('每日 Bing 图片已设置！');
@@ -571,6 +572,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.code === 1) {
                 const imageUrl = data.img; // 获取图片地址
                 setWallpaper(imageUrl); // 设置壁纸
+                localStorage.setItem('customWallpaper', imageUrl); // 保存莫哈维壁纸到 localStorage
                 showMessage('莫哈维动态图已设置！');
             } else {
                 showMessage(`获取莫哈维动态图失败：${data.msg}`); // 显示错误信息
@@ -603,7 +605,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 showMessage('获取动态壁纸失败，请重试');
             }
         } catch (error) {
-            console.error("获取动态壁纸时发生错��:", error);
+            console.error("获取动态壁纸时发生错误:", error);
             showMessage(`获取动态壁纸失败：${error.message}`);
         }
     }
@@ -656,7 +658,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 处理确认按钮点击事件
         document.getElementById('confirmButton').onclick = function() {
-            localStorage.setItem('popupDismissed', Date.now()); // 设置弹窗被确认的时间
+            localStorage.setItem('popupDismissed', Date.now()); // 设置弹窗被确认的时���
             $('#interactiveModal').modal('hide');
             // 移除模态框
             setTimeout(() => {
