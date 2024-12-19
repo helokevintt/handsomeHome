@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 初始化透明度
-    profileCard.style.backgroundColor = `rgba(255, 255, 255, 0.5)`;
+    profileCard.style.backgroundColor = `rgba(255, 255, 255, 0.6)`;
 
     // 点击外部关闭设置面板
     document.addEventListener('click', function(e) {
@@ -464,7 +464,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 壁纸链接
-    const defaultWallpaper = "https://files.codelife.cc/itab/defaultWallpaper/videos/02.mp4"; // 当前使用的默认壁纸链��
+    const defaultWallpaper = "https://files.codelife.cc/itab/defaultWallpaper/videos/02.mp4"; // 当前使用的默认壁纸链接
     const videoBackground = document.querySelector('.video-background');
     const bingWallpaperButton = document.getElementById('bing-wallpaper');
     const resetWallpaperButton = document.getElementById('reset-wallpaper');
@@ -550,7 +550,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 setWallpaper(imageUrl); // 设置壁纸
                 localStorage.setItem('bingWallpaper', imageUrl); // 缓存每日 Bing 图片
                 localStorage.setItem('bingWallpaperTime', Date.now()); // 保存缓存时间
-                showMessage('每日 Bing 图片已设���！');
+                showMessage('每日 Bing 图片已设置！');
             } else {
                 showMessage(`获取每日 Bing 图片失败：${data.msg}`); // 显示错误信息
             }
@@ -611,7 +611,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 绑定按钮事件
-    const randomWallpaperButton = document.getElementById('random-wallpaper'); // 假设您有一个按钮���于获取随机壁纸
+    const randomWallpaperButton = document.getElementById('random-wallpaper'); // 假设您有一个按钮用于获取随机壁纸
     randomWallpaperButton.addEventListener('click', getRandomWallpaper);
 
     // 加载 JSON 文件并返回其内容
@@ -658,7 +658,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 处理确认按钮点击事件
         document.getElementById('confirmButton').onclick = function() {
-            localStorage.setItem('popupDismissed', Date.now()); // 设置弹窗被确认的时间
+            localStorage.setItem('popupDismissed', Date.now()); // 设置弹窗被确认的时���
             $('#interactiveModal').modal('hide');
             // 移除模态框
             setTimeout(() => {
@@ -680,14 +680,17 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    // 添加 Service Worker 支持
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js').then(registration => {
-                console.log('ServiceWorker registration successful');
-            }).catch(err => {
-                console.log('ServiceWorker registration failed: ', err);
-            });
-        });
-    }
+    // 引入配置文件
+    const script = document.createElement('script');
+    script.src = 'js/config.js';
+    script.onload = function() {
+        // 页面载完成后显示出提示
+        setTimeout(() => {
+            const dismissedTime = localStorage.getItem('popupDismissed');
+            if (announcementConfig.showPopup && (!dismissedTime || (Date.now() - dismissedTime > announcementConfig.popupDismissTime))) {
+                showInteractiveMessage(); // 调用弹窗函数
+            }
+        }, announcementConfig.popupDelay);
+    };
+    document.head.appendChild(script);
 }); 
